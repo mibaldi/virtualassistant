@@ -1,6 +1,9 @@
 package com.mibaldi.virtualassistant.di
 
+import com.mibaldi.virtualassistant.data.datasource.LocalDataSource
 import com.mibaldi.virtualassistant.data.datasource.RemoteDataSource
+import com.mibaldi.virtualassistant.data.local.SharedPreferencesDataSource
+import com.mibaldi.virtualassistant.data.server.FirebaseDataSource
 import com.mibaldi.virtualassistant.data.server.RemoteService
 import com.mibaldi.virtualassistant.data.server.ServerDataSource
 import dagger.Binds
@@ -55,5 +58,8 @@ object AppModule {
 abstract class AppDataModule {
 
     @Binds
-    abstract fun bindRemoteDataSource(remoteDataSource: ServerDataSource): RemoteDataSource
+    abstract fun bindRemoteDataSource(remoteDataSource: FirebaseDataSource): RemoteDataSource
+
+    @Binds
+    abstract fun bindLocalRemoteDataSource(localDataSource: SharedPreferencesDataSource):LocalDataSource
 }

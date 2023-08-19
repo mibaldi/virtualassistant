@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
+import androidx.fragment.app.Fragment
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
@@ -12,12 +13,12 @@ import com.google.api.client.util.ExponentialBackOff
 import com.google.api.services.calendar.CalendarScopes
 import pub.devrel.easypermissions.EasyPermissions
 
-fun Activity.getResultsFromApi(mCredential: GoogleAccountCredential,networkError: ()-> Unit,makeRequestTask:()->Unit) {
-    if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) != 0) {
+fun Fragment.getResultsFromApi(mCredential: GoogleAccountCredential, networkError: ()-> Unit, makeRequestTask:()->Unit) {
+    if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(context!!) != 0) {
         acquireGooglePlayServices()
     } else if (mCredential.selectedAccountName == null) {
         chooseAccount(mCredential,networkError,makeRequestTask)
-    } else if (!isDeviceOnline()) {
+    } else if (!context!!.isDeviceOnline()) {
         networkError()
     } else {
         makeRequestTask()
@@ -36,15 +37,15 @@ private fun Context.isDeviceOnline(): Boolean {
     return networkInfo != null && networkInfo.isConnected
 }
 
-private fun Activity.acquireGooglePlayServices() {
+private fun Fragment.acquireGooglePlayServices() {
     val apiAvailability = GoogleApiAvailability.getInstance()
-    val connectionStatusCode = apiAvailability.isGooglePlayServicesAvailable(this)
+    val connectionStatusCode = apiAvailability.isGooglePlayServicesAvailable(context!!)
     if (apiAvailability.isUserResolvableError(connectionStatusCode)) {
         showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode)
     }
 }
 
-fun Activity.showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode: Int) {
+fun Fragment.showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode: Int) {
     val apiAvailability = GoogleApiAvailability.getInstance()
     val dialog = apiAvailability.getErrorDialog(
         this,
@@ -54,11 +55,11 @@ fun Activity.showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode:
     dialog?.show()
 }
 
-private fun Activity.chooseAccount(mCredential: GoogleAccountCredential,networkError: ()-> Unit,makeRequestTask:()->Unit) {
+private fun Fragment.chooseAccount(mCredential: GoogleAccountCredential,networkError: ()-> Unit,makeRequestTask:()->Unit) {
 
-    if (EasyPermissions.hasPermissions(this, android.Manifest.permission.GET_ACCOUNTS)
+    if (EasyPermissions.hasPermissions(context!!, android.Manifest.permission.GET_ACCOUNTS)
     ) {
-        val accountName = this.getPreferences(Context.MODE_PRIVATE)
+        val accountName = activity?.getPreferences(Context.MODE_PRIVATE)
             ?.getString(Constants.PREF_ACCOUNT_NAME, null)
         if (accountName != null) {
             mCredential.selectedAccountName = accountName
@@ -81,7 +82,7 @@ private fun Activity.chooseAccount(mCredential: GoogleAccountCredential,networkE
     }
 }
 
-fun Activity.onActivityResult(mCredential: GoogleAccountCredential,requestCode: Int, resultCode: Int, data: Intent?,errorPlayServices:()->Unit,getResultsFromApiExtracted:()->Unit){
+fun Fragment.onActivityResult(mCredential: GoogleAccountCredential,requestCode: Int, resultCode: Int, data: Intent?,errorPlayServices:()->Unit,getResultsFromApiExtracted:()->Unit){
 
     when (requestCode) {
         Constants.REQUEST_GOOGLE_PLAY_SERVICES -> if (resultCode != Activity.RESULT_OK) {
@@ -96,7 +97,7 @@ fun Activity.onActivityResult(mCredential: GoogleAccountCredential,requestCode: 
         ) {
             val accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
             if (accountName != null) {
-                val settings = this.getPreferences(Context.MODE_PRIVATE)
+                val settings = activity?.getPreferences(Context.MODE_PRIVATE)
                 val editor = settings?.edit()
                 editor?.putString(Constants.PREF_ACCOUNT_NAME, accountName)
                 editor?.apply()

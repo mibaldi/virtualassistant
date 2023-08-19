@@ -6,4 +6,5 @@ import com.mibaldi.virtualassistant.domain.MyError
 
 interface RemoteDataSource {
     suspend fun getEvents(): Either<MyError, List<Event>>
+    suspend fun getBookings(): Either<MyError, List<Event>>
 }

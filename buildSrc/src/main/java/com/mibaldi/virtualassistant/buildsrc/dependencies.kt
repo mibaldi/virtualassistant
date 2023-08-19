@@ -72,15 +72,15 @@ object Libs {
         }
         object Compose {
             object UI {
-                private const val version = "1.3.2"
+                private const val version = "1.5.0"
                 const val ui = "androidx.compose.ui:ui:$version"
                 const val tooling = "androidx.compose.ui:ui-tooling:$version"
                 const val toolingPreview = "androidx.compose.ui:ui-tooling-preview:$version"
             }
 
             object Material3 {
-                const val material3 = "androidx.compose.material3:material3:1.0.1"
-                const val materialIconsExtended = "androidx.compose.material:material-icons-extended:1.3.1"
+                const val material3 = "androidx.compose.material3:material3:1.2.0-alpha05"
+                const val materialIconsExtended = "androidx.compose.material:material-icons-extended-android:1.5.0"
             }
         }
     }
@@ -120,6 +120,7 @@ object Libs {
     object Coil {
         private const val version = "2.2.0"
         const val compose = "io.coil-kt:coil-compose:$version"
+        const val gif = "io.coil-kt:coil-gif:$version"
     }
 
     object JUnit {

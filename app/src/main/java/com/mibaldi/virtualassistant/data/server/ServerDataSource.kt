@@ -13,4 +13,12 @@ class ServerDataSource @Inject constructor(): RemoteDataSource {
         }
         return Either.Right(list)
     }
+
+    override suspend fun getBookings(): Either<MyError, List<Event>> {
+        val list = mutableListOf<Event>()
+        list.add(Event(1,"Peluqueria","R.drawable.peluqueria"))
+        list.add(Event(2,"Fisio","R.drawable.fisio"))
+        list.add(Event(3,"Dentista","R.drawable.dentista"))
+        return Either.Right(list)
+    }
 }

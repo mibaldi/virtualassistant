@@ -6,12 +6,20 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id ("org.jetbrains.kotlin.kapt")
     id ("dagger.hilt.android.plugin")
+    id("com.google.gms.google-services")
 }
 
 android {
     namespace = "com.mibaldi.virtualassistant"
     compileSdk = 34
-
+    signingConfigs {
+        create("api") {
+            storeFile = file("D:\\PROGRAMACION\\CLAVES\\mibaldicalendar.jks")
+            storePassword = "mibaldicalendar"
+            keyAlias = "mibaldicalendar"
+            keyPassword = "mibaldicalendar"
+        }
+    }
     defaultConfig {
         applicationId = "com.mibaldi.virtualassistant"
         minSdk = 29
@@ -26,13 +34,15 @@ android {
     }
 
     buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+        debug {
+            signingConfig =  signingConfigs.getByName("api")
         }
+        release {
+            signingConfig =  signingConfigs.getByName("api")
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -88,10 +98,14 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
+    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
+    implementation("com.google.firebase:firebase-database-ktx:20.2.2")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
     kapt(Libs.AndroidX.Room.compiler)
     implementation(Libs.Glide.glide)
     kapt(Libs.Glide.compiler)
@@ -111,6 +125,7 @@ dependencies {
     implementation (Libs.AndroidX.Lifecycle.viewmodelCompose)
     implementation (Libs.AndroidX.Navigation.compose)
     implementation (Libs.Coil.compose)
+    implementation (Libs.Coil.gif)
     implementation (Libs.Hilt.navigationCompose)
     debugImplementation (Libs.AndroidX.Compose.UI.tooling)
     implementation("androidx.credentials:credentials:1.2.0-beta01")

@@ -3,6 +3,7 @@ package com.mibaldi.virtualassistant.ui.login
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.biometric.BiometricPrompt.PromptInfo
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +16,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,7 +34,9 @@ import com.mibaldi.virtualassistant.R
 import com.mibaldi.virtualassistant.ui.biometric.authenticate
 import com.mibaldi.virtualassistant.ui.biometric.setupPrompt
 import com.mibaldi.virtualassistant.ui.common.MainAppBar
+import com.mibaldi.virtualassistant.ui.common.goToBooking
 import com.mibaldi.virtualassistant.ui.common.goToMain
+import com.mibaldi.virtualassistant.ui.main.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -44,6 +48,8 @@ class LoginActivity : AppCompatActivity() {
     private  var promptInfoStrong :PromptInfo?= null
     private var promptInfoWeak :PromptInfo?=null
     private var promptInfoWeakCredential :PromptInfo?= null
+    private val viewModel: LoginViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -51,8 +57,8 @@ class LoginActivity : AppCompatActivity() {
                 Scaffold(
                     topBar = { MainAppBar(stringResource(id = R.string.app_name)) }
                 ) { _ ->
-                    Auth{
-                        goToMain()
+                    Auth(viewModel){
+                        goToBooking()
                     }
                 }
             }
@@ -60,11 +66,14 @@ class LoginActivity : AppCompatActivity() {
         promptInfoStrong = setupPrompt(LevelAuthenticator.STRONG)
         promptInfoWeak = setupPrompt(LevelAuthenticator.WEAK)
         promptInfoWeakCredential = setupPrompt(LevelAuthenticator.WEAK_CREDENTIAL)
+
+        viewModel.getCurrentUserStatus()
     }
 
     @Composable
-    fun Auth(navigation:()->Unit){
-        var auth by remember{ mutableStateOf(false) }
+    fun Auth(vm: LoginViewModel,navigation:()->Unit){
+        val auth by vm.isLogged.collectAsState()
+        if (auth) goToMain()
         Column(
             Modifier
                 .background(if (auth) Color.Green else Color.Red)
@@ -75,40 +84,36 @@ class LoginActivity : AppCompatActivity() {
             Text(if (auth) "Estas autenticado" else "Necesitas autenticarte", fontSize = 22.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(9.dp))
             Button(onClick = {
-                if (auth){
-                    auth = false
-                }else{
-                    authenticate(promptInfoStrong) {
-                        auth = it
-                        navigation()
-                    }
-                }
+                extracted(auth, vm,promptInfoStrong, navigation)
             }){
                 Text(if (auth) "Cerrar" else "Autenticar Strong")
             }
             Button(onClick = {
-                if (auth){
-                    auth = false
-                }else{
-                    authenticate(promptInfoWeak) {
-                        auth = it
-                        navigation()
-                    }
-                }
+                extracted(auth, vm,promptInfoWeak, navigation)
             }){
                 Text(if (auth) "Cerrar" else "Autenticar Weak")
             }
             Button(onClick = {
-                if (auth){
-                    auth = false
-                }else{
-                    authenticate(promptInfoWeakCredential) {
-                        auth = it
-                        navigation()
-                    }
-                }
+                extracted(auth, vm,promptInfoWeakCredential, navigation)
             }){
                 Text(if (auth) "Cerrar" else "Autenticar Weak Credential")
+            }
+        }
+    }
+
+
+    private fun extracted(
+        auth: Boolean,
+        vm: LoginViewModel,
+        promptInfo: PromptInfo?,
+        navigation: () -> Unit
+    ) {
+        if (auth) {
+            vm.setCurrentUserStatus(false)
+        } else {
+            authenticate(promptInfo) {
+                vm.setCurrentUserStatus(it)
+                navigation()
             }
         }
     }

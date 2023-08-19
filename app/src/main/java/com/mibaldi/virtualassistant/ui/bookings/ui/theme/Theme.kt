@@ -1,4 +1,4 @@
-package com.mibaldi.virtualassistant.ui.common.theme
+package com.mibaldi.virtualassistant.ui.bookings.ui.theme
 
 import android.app.Activity
 import android.os.Build
@@ -55,12 +55,10 @@ fun VirtualAssistantTheme(
     }
     val view = LocalView.current
     if (!view.isInEditMode) {
-        if (view.context is Activity){
-            SideEffect {
-                val window = (view.context as Activity).window
-                window.statusBarColor = colorScheme.primary.toArgb()
-                WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
-            }
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = colorScheme.primary.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
         }
     }
 
