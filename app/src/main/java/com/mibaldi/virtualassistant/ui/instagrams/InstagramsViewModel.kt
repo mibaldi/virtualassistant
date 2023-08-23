@@ -1,12 +1,11 @@
-package com.mibaldi.virtualassistant.ui.main
+package com.mibaldi.virtualassistant.ui.instagrams
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mibaldi.virtualassistant.domain.Event
+import com.mibaldi.virtualassistant.domain.InstagramProfile
 import com.mibaldi.virtualassistant.domain.MyError
-import com.mibaldi.virtualassistant.usecases.ChatGptUseCase
 import com.mibaldi.virtualassistant.usecases.GetEventsUseCase
+import com.mibaldi.virtualassistant.usecases.GetInstagramsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,35 +16,27 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(
-    private val getEventsUseCase: GetEventsUseCase
+class InstagramsViewModel @Inject constructor(
+    private val getInstagramsUseCase: GetInstagramsUseCase
 ) : ViewModel() {
-
-    private val _name = MutableStateFlow("")
-    val name : StateFlow<String> = _name.asStateFlow()
 
     private val _state = MutableStateFlow(UiState())
     val state : StateFlow<UiState> = _state.asStateFlow()
 
-    fun getName(){
-        viewModelScope.launch {
-            _name.update { "Mikel" }
-        }
-    }
 
-    fun getEvents() {
+    fun getInstagrams() {
         viewModelScope.launch(Dispatchers.IO) {
-            getEventsUseCase().fold(
+            getInstagramsUseCase().fold(
                 ifLeft = { cause -> _state.update { it.copy(error = cause, loading =  false) }},
                 ifRight = {result ->
-                    _state.update { UiState(events = result) }
+                    _state.update { UiState(instagrams = result) }
                 }
             )
         }
     }
     data class UiState(
         val loading: Boolean = false,
-        val events: List<Event>? = null,
+        val instagrams: List<InstagramProfile>? = null,
         val error: MyError? = null
     )
 

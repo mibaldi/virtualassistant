@@ -9,8 +9,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
-const val trabajo = "adf1d95fec533eb37e30e31dd6c4e0df59c0a30b4ac26adfaf3f44ed8b1252f1@group.calendar.google.com"
-const val entrenamientos = "35919c061713127afb13d16fff2188df89e5e0ae092a5a99ad6c8d50860a0e73@group.calendar.google.com"
+const val citas = "64c551ece5289b93dd46541fb2fb87415cb86b4513c67c4e74b6ac5b89b3220a@group.calendar.google.com"
 
 fun getEvents(mService: Calendar,calendarId:String):List<Event>{
     val now = DateTime(System.currentTimeMillis())
@@ -41,17 +40,19 @@ fun getEvents(mService: Calendar,calendarId:String):List<Event>{
 fun setMibaldiEvents(mService: Calendar,eventName: String,dateString:String){
     val newEvent = createEvent(eventName,dateString)
     mService.events()
-        .insert(entrenamientos,newEvent)
+        .insert(citas,newEvent)
         .execute()
 }
 fun createEvent(name:String,date:String): Event {
     val event = Event()
     event.summary = name
+    val madrid = "Europe/Madrid"
+    val timeZone = TimeZone.getTimeZone(madrid)
     val obtainDate = obtainDate(date)
-    val datetimeStart = DateTime(obtainDate, TimeZone.getTimeZone("Europe/Madrid"))
-    val datetimeEnd = DateTime(addOneHourToDate(obtainDate), TimeZone.getTimeZone("Europe/Madrid"))
-    event.start = EventDateTime().setDateTime(datetimeStart).setTimeZone("Europe/Madrid")
-    event.end = EventDateTime().setDateTime(datetimeEnd).setTimeZone("Europe/Madrid")
+    val datetimeStart = DateTime(obtainDate, timeZone)
+    val datetimeEnd = DateTime(addOneHourToDate(obtainDate), timeZone)
+    event.start = EventDateTime().setDateTime(datetimeStart).setTimeZone(madrid)
+    event.end = EventDateTime().setDateTime(datetimeEnd).setTimeZone(madrid)
     return event
 }
 fun obtainDate(date:String):Date{

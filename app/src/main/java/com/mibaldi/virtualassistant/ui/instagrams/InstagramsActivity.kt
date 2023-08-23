@@ -1,35 +1,29 @@
-package com.mibaldi.virtualassistant.ui.main
+package com.mibaldi.virtualassistant.ui.instagrams
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.ExperimentalFoundationApi
-import com.mibaldi.virtualassistant.ui.common.DatePickerUI
 import com.mibaldi.virtualassistant.ui.common.UserViewModel
-import com.mibaldi.virtualassistant.ui.common.goToBooking
-import com.mibaldi.virtualassistant.ui.common.goToDetail
 import com.mibaldi.virtualassistant.ui.common.goToHome
+import com.mibaldi.virtualassistant.ui.common.goToInstagram
 import dagger.hilt.android.AndroidEntryPoint
 
 @OptIn(ExperimentalFoundationApi::class)
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
-    private val viewModel: MainViewModel by viewModels()
+class InstagramsActivity : ComponentActivity() {
+    private val viewModel: InstagramsViewModel by viewModels()
     private val userViewModel: UserViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MainScreen(onNavigate = {
-                if (it == 0){
-                    goToBooking()
-                }
+            InstagramsScreen(onNavigate = {
+                goToInstagram(it)
             }) {
                 userViewModel.setUserLoggedOut()
             }
         }
-
-        viewModel.getEvents()
         userViewModel.isLoggedIn.observe(this){
                 isLoggedIn ->
             if (!isLoggedIn) {
@@ -41,6 +35,3 @@ class MainActivity : ComponentActivity() {
 
     }
 }
-
-
-

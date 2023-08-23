@@ -28,12 +28,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.mibaldi.virtualassistant.ui.biometric.LevelAuthenticator
 import com.mibaldi.virtualassistant.MyAppComposable
 import com.mibaldi.virtualassistant.R
 import com.mibaldi.virtualassistant.ui.biometric.authenticate
 import com.mibaldi.virtualassistant.ui.biometric.setupPrompt
 import com.mibaldi.virtualassistant.ui.common.MainAppBar
+import com.mibaldi.virtualassistant.ui.common.UserViewModel
 import com.mibaldi.virtualassistant.ui.common.goToBooking
 import com.mibaldi.virtualassistant.ui.common.goToMain
 import com.mibaldi.virtualassistant.ui.main.MainViewModel
@@ -58,7 +60,7 @@ class LoginActivity : AppCompatActivity() {
                     topBar = { MainAppBar(stringResource(id = R.string.app_name)) }
                 ) { _ ->
                     Auth(viewModel){
-                        goToBooking()
+                        goToMain()
                     }
                 }
             }
@@ -71,7 +73,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     @Composable
-    fun Auth(vm: LoginViewModel,navigation:()->Unit){
+    fun Auth(vm: LoginViewModel,userViewModel: UserViewModel = hiltViewModel(),navigation:()->Unit){
         val auth by vm.isLogged.collectAsState()
         if (auth) goToMain()
         Column(
@@ -84,17 +86,17 @@ class LoginActivity : AppCompatActivity() {
             Text(if (auth) "Estas autenticado" else "Necesitas autenticarte", fontSize = 22.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(9.dp))
             Button(onClick = {
-                extracted(auth, vm,promptInfoStrong, navigation)
+                extracted(auth, vm,userViewModel,promptInfoStrong, navigation)
             }){
                 Text(if (auth) "Cerrar" else "Autenticar Strong")
             }
             Button(onClick = {
-                extracted(auth, vm,promptInfoWeak, navigation)
+                extracted(auth, vm,userViewModel,promptInfoWeak, navigation)
             }){
                 Text(if (auth) "Cerrar" else "Autenticar Weak")
             }
             Button(onClick = {
-                extracted(auth, vm,promptInfoWeakCredential, navigation)
+                extracted(auth, vm,userViewModel,promptInfoWeakCredential, navigation)
             }){
                 Text(if (auth) "Cerrar" else "Autenticar Weak Credential")
             }
@@ -105,13 +107,16 @@ class LoginActivity : AppCompatActivity() {
     private fun extracted(
         auth: Boolean,
         vm: LoginViewModel,
+        userViewModel: UserViewModel,
         promptInfo: PromptInfo?,
         navigation: () -> Unit
     ) {
         if (auth) {
             vm.setCurrentUserStatus(false)
+            userViewModel.setUserLoggedOut()
         } else {
             authenticate(promptInfo) {
+                userViewModel.setUserLoggedIn()
                 vm.setCurrentUserStatus(it)
                 navigation()
             }

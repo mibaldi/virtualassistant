@@ -146,6 +146,11 @@ dependencies {
     //so that we can easily control permissions
     implementation ("pub.devrel:easypermissions:3.0.0")
 
+
+    implementation ("com.google.accompanist:accompanist-pager:0.28.0")
+    implementation ("com.google.accompanist:accompanist-pager-indicators:0.28.0")
+    implementation ("com.google.accompanist:accompanist-systemuicontroller:0.28.0")
+
     /*testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

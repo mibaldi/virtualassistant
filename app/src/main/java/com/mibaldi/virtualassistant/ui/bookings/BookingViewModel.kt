@@ -46,16 +46,18 @@ class BookingViewModel @Inject constructor(
             )
         }
     }
-
+    fun setToast(state:Boolean) {
+        _state.update { it.copy(showToast = state) }
+    }
     fun setDataInCalendar(mService:Calendar) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 setMibaldiEvents(mService, setBooking.value.name, setBooking.value.dateString)
+                setToast(true)
             } catch (e: IOException) {
                 Log.d("Google", e.message.toString())
                 if (e is UserRecoverableAuthIOException) {
                     _error.value = AccountError(e)
-                    //startActivityForResult(e.intent, Constants.REQUEST_AUTHORIZATION)
                 }
             }
         }
@@ -69,21 +71,8 @@ class BookingViewModel @Inject constructor(
     data class AccountError(val exception: UserRecoverableAuthIOException)
     data class UiState(
         val loading: Boolean = false,
+        val showToast: Boolean = false,
         val events: List<Event>? = null,
         val error: MyError? = null
     )
-    /*private fun joinDateAndTime(date: Long,time:String){
-        val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.ROOT)
-        val dayMonthYear = formatter.format(Date(date))
-
-        val dateString = "$dayMonthYear $time"
-        val dateFormat = "dd/MM/yyyy HH:mm"
-        val timestamp = dateToTimestamp(dateString, dateFormat)
-        Log.d("FECHAVIEWMODEL","$dateString - $timestamp")
-    }
-    private fun dateToTimestamp(dateString: String, dateFormat: String): Long {
-        val format = SimpleDateFormat(dateFormat, Locale.getDefault())
-        val date = format.parse(dateString)
-        return date?.time ?: 0L
-    }*/
 }

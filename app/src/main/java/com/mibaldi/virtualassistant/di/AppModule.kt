@@ -1,11 +1,16 @@
 package com.mibaldi.virtualassistant.di
 
+import android.content.Context
+import com.mibaldi.virtualassistant.App
+import com.mibaldi.virtualassistant.data.datasource.ChatGptDataSource
 import com.mibaldi.virtualassistant.data.datasource.LocalDataSource
 import com.mibaldi.virtualassistant.data.datasource.RemoteDataSource
 import com.mibaldi.virtualassistant.data.local.SharedPreferencesDataSource
 import com.mibaldi.virtualassistant.data.server.FirebaseDataSource
 import com.mibaldi.virtualassistant.data.server.RemoteService
 import com.mibaldi.virtualassistant.data.server.ServerDataSource
+import com.mibaldi.virtualassistant.data.server.chatgpt.ChatGptServerDataSource
+import com.mibaldi.virtualassistant.data.server.chatgpt.ChatGptService
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -23,8 +28,10 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    @ApiUrl
-    fun provideApiUrl(): String = "https://www.zaragoza.es/sede/servicio/"
+    @ApiChatGptUrl
+    fun provideApiUrl(): String = "https://api.openai.com/v1/"
+
+    val secret = "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"
 
     @Provides
     @Singleton
@@ -35,6 +42,7 @@ object AppModule {
                 val original = it.request()
                 val request = original.newBuilder()
                     .header("accept","application/json")
+                    .header("Authorization","Bearer $secret")
                     .method(original.method,original.body).build()
                 it.proceed(request)
             }
@@ -42,7 +50,7 @@ object AppModule {
     }
     @Provides
     @Singleton
-    fun provideRemoteService(@ApiUrl apiUrl: String, okHttpClient: OkHttpClient): RemoteService {
+    fun provideRemoteService(@ApiChatGptUrl apiUrl: String, okHttpClient: OkHttpClient): ChatGptService {
 
         return Retrofit.Builder()
             .baseUrl(apiUrl)
@@ -51,6 +59,9 @@ object AppModule {
             .build()
             .create()
     }
+    @Provides
+    @Singleton
+    fun provideApplicationContext(application: App): Context = application.applicationContext
 }
 
 @Module
@@ -59,6 +70,9 @@ abstract class AppDataModule {
 
     @Binds
     abstract fun bindRemoteDataSource(remoteDataSource: FirebaseDataSource): RemoteDataSource
+
+    @Binds
+    abstract fun bindChatGptDataSource(chatGptDataSource: ChatGptServerDataSource): ChatGptDataSource
 
     @Binds
     abstract fun bindLocalRemoteDataSource(localDataSource: SharedPreferencesDataSource):LocalDataSource

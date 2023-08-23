@@ -1,39 +1,34 @@
 package com.mibaldi.virtualassistant.data.managers
-
 import android.accounts.AccountManager
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.net.ConnectivityManager
-import androidx.fragment.app.Fragment
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
-import com.google.api.client.util.ExponentialBackOff
-import com.google.api.services.calendar.CalendarScopes
 import pub.devrel.easypermissions.EasyPermissions
 
-fun Fragment.getResultsFromApi(mCredential: GoogleAccountCredential, networkError: ()-> Unit, makeRequestTask:()->Unit) {
-    if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(context!!) != 0) {
+fun Activity.getResultsFromApi(mCredential: GoogleAccountCredential,networkError: ()-> Unit,makeRequestTask:()->Unit) {
+    if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) != 0) {
         acquireGooglePlayServices()
     } else if (mCredential.selectedAccountName == null) {
         chooseAccount(mCredential,networkError,makeRequestTask)
-    } else if (!context!!.isDeviceOnline()) {
+    } else if (!isDeviceOnline()) {
         networkError()
     } else {
         makeRequestTask()
     }
 }
 
-private fun Fragment.acquireGooglePlayServices() {
+fun Activity.acquireGooglePlayServices() {
     val apiAvailability = GoogleApiAvailability.getInstance()
-    val connectionStatusCode = apiAvailability.isGooglePlayServicesAvailable(context!!)
+    val connectionStatusCode = apiAvailability.isGooglePlayServicesAvailable(this)
     if (apiAvailability.isUserResolvableError(connectionStatusCode)) {
         showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode)
     }
 }
 
-fun Fragment.showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode: Int) {
+fun Activity.showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode: Int) {
     val apiAvailability = GoogleApiAvailability.getInstance()
     val dialog = apiAvailability.getErrorDialog(
         this,
@@ -43,11 +38,11 @@ fun Fragment.showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode:
     dialog?.show()
 }
 
-private fun Fragment.chooseAccount(mCredential: GoogleAccountCredential,networkError: ()-> Unit,makeRequestTask:()->Unit) {
+private fun Activity.chooseAccount(mCredential: GoogleAccountCredential,networkError: ()-> Unit,makeRequestTask:()->Unit) {
 
-    if (EasyPermissions.hasPermissions(context!!, android.Manifest.permission.GET_ACCOUNTS)
+    if (EasyPermissions.hasPermissions(this, android.Manifest.permission.GET_ACCOUNTS)
     ) {
-        val accountName = activity?.getPreferences(Context.MODE_PRIVATE)
+        val accountName = this.getPreferences(Context.MODE_PRIVATE)
             ?.getString(Constants.PREF_ACCOUNT_NAME, null)
         if (accountName != null) {
             mCredential.selectedAccountName = accountName
@@ -60,6 +55,9 @@ private fun Fragment.chooseAccount(mCredential: GoogleAccountCredential,networkE
             )
         }
     } else {
+
+
+
         // Request the GET_ACCOUNTS permission via a user dialog
         EasyPermissions.requestPermissions(
             this,
@@ -70,21 +68,22 @@ private fun Fragment.chooseAccount(mCredential: GoogleAccountCredential,networkE
     }
 }
 
-fun Fragment.onActivityResult(mCredential: GoogleAccountCredential,requestCode: Int, resultCode: Int, data: Intent?,errorPlayServices:()->Unit,getResultsFromApiExtracted:()->Unit){
+fun Activity.onActivityResult(mCredential: GoogleAccountCredential,requestCode: Int, resultCode: Int, data: Intent?,errorPlayServices:()->Unit,getResultsFromApiExtracted:()->Unit){
 
     when (requestCode) {
-        Constants.REQUEST_GOOGLE_PLAY_SERVICES -> if (resultCode != Activity.RESULT_OK) {
+        /*Constants.REQUEST_GOOGLE_PLAY_SERVICES -> if (resultCode != Activity.RESULT_OK) {
             errorPlayServices()
         } else {
             getResultsFromApiExtracted()
 
         }
 
-        Constants.REQUEST_ACCOUNT_PICKER ->
-            if (resultCode == Activity.RESULT_OK && data != null && data.extras != null) {
+        Constants.REQUEST_ACCOUNT_PICKER -> if (resultCode == Activity.RESULT_OK && data != null &&
+            data.extras != null
+        ) {
             val accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
             if (accountName != null) {
-                val settings = activity?.getPreferences(Context.MODE_PRIVATE)
+                val settings = this.getPreferences(Context.MODE_PRIVATE)
                 val editor = settings?.edit()
                 editor?.putString(Constants.PREF_ACCOUNT_NAME, accountName)
                 editor?.apply()
@@ -96,7 +95,7 @@ fun Fragment.onActivityResult(mCredential: GoogleAccountCredential,requestCode: 
 
         Constants.REQUEST_AUTHORIZATION -> if (resultCode == Activity.RESULT_OK) {
             getResultsFromApiExtracted()
-
-        }
+        }*/
     }
 }
+
