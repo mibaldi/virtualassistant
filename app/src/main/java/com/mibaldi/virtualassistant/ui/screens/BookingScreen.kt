@@ -1,11 +1,9 @@
-package com.mibaldi.virtualassistant.ui.bookings
+package com.mibaldi.virtualassistant.ui.screens
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -20,7 +18,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,36 +27,38 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.common.GooglePlayServicesUtil
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
-import com.google.api.services.calendar.Calendar
-import com.mibaldi.virtualassistant.MyAppComposable
 import com.mibaldi.virtualassistant.R
 import com.mibaldi.virtualassistant.data.managers.Constants
 import com.mibaldi.virtualassistant.data.managers.acquireGooglePlayServices
 import com.mibaldi.virtualassistant.data.managers.isDeviceOnline
 import com.mibaldi.virtualassistant.domain.Event
+import com.mibaldi.virtualassistant.ui.bookings.BookingState
+import com.mibaldi.virtualassistant.ui.bookings.BookingViewModel
+import com.mibaldi.virtualassistant.ui.bookings.rememberBookingState
+import com.mibaldi.virtualassistant.ui.bookings.workWithEvents
 import com.mibaldi.virtualassistant.ui.common.CustomDialog
 import com.mibaldi.virtualassistant.ui.common.GifImage
-import com.mibaldi.virtualassistant.ui.common.MainAppBar
 import com.mibaldi.virtualassistant.ui.common.Thumb
 import com.mibaldi.virtualassistant.ui.common.Title
-import com.mibaldi.virtualassistant.ui.common.UserViewModel
 import com.mibaldi.virtualassistant.ui.common.goToHome
 import pub.devrel.easypermissions.EasyPermissions
 
 
 @ExperimentalFoundationApi
 @Composable
-fun BookingScreen(onNavigate: (Int) -> Unit,nav:()->Unit,vm: BookingViewModel = hiltViewModel(),bookingState: BookingState = rememberBookingState()) {
+fun BookingScreen(onNavigate: (Int) -> Unit, nav:()->Unit, vm: BookingViewModel = hiltViewModel(), bookingState: BookingState = rememberBookingState()) {
 
 
-    bookingState.generateAccountPickerLauncher()
-    bookingState.generateGetAccountLauncher()
+    bookingState.generateAccountPickerLauncher(){
+        vm.setDataInCalendar(bookingState.mService!!)
+    }
+    bookingState.generateGetAccountLauncher(){
+        vm.setDataInCalendar(bookingState.mService!!)
+    }
     LaunchedEffect(Unit){
         vm.getBookings()
     }
@@ -92,7 +91,9 @@ fun BookingScreen(onNavigate: (Int) -> Unit,nav:()->Unit,vm: BookingViewModel = 
                             ?.getString(Constants.PREF_ACCOUNT_NAME, null)
                         if (accountName != null) {
                             bookingState.mCredential.selectedAccountName = accountName
-                            setEvents(bookingState.context,bookingState.mCredential,vm,bookingState.mService,bookingState.accountPickerLauncher,bookingState.getAccountLauncher)
+                            workWithEvents(bookingState.context,bookingState.mCredential,vm,bookingState.mService,bookingState.accountPickerLauncher,bookingState.getAccountLauncher) {
+                                vm.setDataInCalendar(bookingState.mService!!)
+                            }
                         } else {
                             // Start a dialog from which the user can choose an account
                             bookingState.accountPickerLauncher.launch(bookingState.mCredential.newChooseAccountIntent())
@@ -141,32 +142,7 @@ fun BookingScreen(onNavigate: (Int) -> Unit,nav:()->Unit,vm: BookingViewModel = 
 
 
 
-fun setEvents(context: Context,mCredential: GoogleAccountCredential,viewModel: BookingViewModel,mService:Calendar?,accountPickerLauncher: ActivityResultLauncher<Intent>,getAccountLauncher:ActivityResultLauncher<String>){
-    with (context as Activity){
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) != 0) {
-            (context as Activity).acquireGooglePlayServices()
-        } else if (mCredential.selectedAccountName == null) {
-            if (EasyPermissions.hasPermissions(this, android.Manifest.permission.GET_ACCOUNTS)
-            ) {
-                val accountName = this.getPreferences(Context.MODE_PRIVATE)
-                    ?.getString(Constants.PREF_ACCOUNT_NAME, null)
-                if (accountName != null) {
-                    mCredential.selectedAccountName = accountName
-                    setEvents(context,mCredential,viewModel,mService,accountPickerLauncher,getAccountLauncher)
-                } else {
-                    // Start a dialog from which the user can choose an account
-                    accountPickerLauncher.launch(mCredential.newChooseAccountIntent())
-                }
-            } else {
-                getAccountLauncher.launch(android.Manifest.permission.GET_ACCOUNTS)
-            }
-        } else if (!isDeviceOnline()) {
-            Log.d("SETEVENT","ERROR" )
-        } else {
-            viewModel.setDataInCalendar(mService!!)
-        }
-    }
-}
+
 
 @ExperimentalFoundationApi
 @Composable

@@ -36,7 +36,6 @@ import com.mibaldi.virtualassistant.ui.biometric.authenticate
 import com.mibaldi.virtualassistant.ui.biometric.setupPrompt
 import com.mibaldi.virtualassistant.ui.common.MainAppBar
 import com.mibaldi.virtualassistant.ui.common.UserViewModel
-import com.mibaldi.virtualassistant.ui.common.goToBooking
 import com.mibaldi.virtualassistant.ui.common.goToMain
 import com.mibaldi.virtualassistant.ui.main.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint

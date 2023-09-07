@@ -6,9 +6,6 @@ import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
 import androidx.core.app.ShareCompat
-import com.mibaldi.virtualassistant.ui.bookings.BookingActivity
-import com.mibaldi.virtualassistant.ui.chat.ChatActivity
-import com.mibaldi.virtualassistant.ui.instagrams.InstagramsActivity
 import com.mibaldi.virtualassistant.ui.login.LoginActivity
 import com.mibaldi.virtualassistant.MainActivity
 
@@ -19,20 +16,6 @@ fun Context.goToMain(){
 }
 fun Context.goToHome(){
     startActivity(Intent(this, LoginActivity::class.java))
-}
-
-fun Context.goToBooking(){
-    startActivity(Intent(this, BookingActivity::class.java))
-}
-
-fun Context.goToChat(){
-    startActivity(Intent(this, ChatActivity::class.java))
-}
-fun Context.goToInstagrams(){
-    startActivity(Intent(this, InstagramsActivity::class.java))
-}
-fun Context.goToCalendar(){
-    startActivity(Intent(this, InstagramsActivity::class.java))
 }
 
 fun Context.goToInstagram(perfilUsuario: String){
@@ -85,31 +68,7 @@ fun Context.openPhone(numberPhone:String){
     dialIntent.data = Uri.parse("tel:${numberPhone.replace(" ","")}")
     startActivity(dialIntent)
 }
-/*
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun BookingNavHost(userViewModel: UserViewModel = hiltViewModel()) {
-    val navController = rememberNavController()
-    NavHost(
-        navController = navController,
-        startDestination = "booking"
-    ) {
-        composable("booking") {
-            BookingScreen({
-                Log.d("CLICK","elemento clicado $it")
-            },{
-                userViewModel.setUserLoggedOut()
-            })
-        }
-        composable("calendar") {
-            CalendarScreen({
-                Log.d("CLICK","elemento clicado $it")
-            }, navController) {
-                userViewModel.setUserLoggedOut()
-            }
-        }
-    }
-}*/
+
 
 
 

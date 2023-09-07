@@ -1,4 +1,4 @@
-package com.mibaldi.virtualassistant.ui.instagrams
+package com.mibaldi.virtualassistant.ui.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,38 +21,38 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.mibaldi.virtualassistant.MyAppComposable
 import com.mibaldi.virtualassistant.R
-import com.mibaldi.virtualassistant.domain.Event
 import com.mibaldi.virtualassistant.domain.InstagramProfile
 import com.mibaldi.virtualassistant.ui.common.GifImage
-import com.mibaldi.virtualassistant.ui.common.MainAppBar
 import com.mibaldi.virtualassistant.ui.common.Thumb
 import com.mibaldi.virtualassistant.ui.common.Title
+import com.mibaldi.virtualassistant.ui.common.theme.SmallDP
+import com.mibaldi.virtualassistant.ui.instagrams.InstagramsViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @ExperimentalFoundationApi
 @Composable
-fun InstagramsScreen(onNavigate: (String) -> Unit,logout:()->Unit) {
-    MyAppComposable {
+fun InstagramsScreen(onNavigate: (String) -> Unit) {
+    /*MyAppComposable {
         Scaffold(
             topBar = { MainAppBar(stringResource(id = R.string.app_name), logout = { logout() }) }
         ) { padding ->
-            Column (modifier = Modifier.padding(padding)){
-                GifImage(url="https://firebasestorage.googleapis.com/v0/b/virtualassistant-b1514.appspot.com/o/sam-sam-from-samsung.gif?alt=media&token=47bd221f-89ca-4673-b170-70a136af7d16")
-                Text(text = "Cuentas de instagram Importantes",
-                    modifier = Modifier.fillMaxWidth().padding(10.dp),
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center)
-                InstagramsContent(onNavigate = onNavigate, modifier = Modifier.padding(10.dp))
-            }
+
 
         }
+    }*/
+
+    Column {
+        GifImage(url="https://firebasestorage.googleapis.com/v0/b/virtualassistant-b1514.appspot.com/o/sam-sam-from-samsung.gif?alt=media&token=47bd221f-89ca-4673-b170-70a136af7d16")
+        Text(text = "Cuentas de instagram Importantes",
+            modifier = Modifier.fillMaxWidth().padding(SmallDP),
+            style = MaterialTheme.typography.titleLarge,
+            textAlign = TextAlign.Center)
+        InstagramsContent(onNavigate = onNavigate, modifier = Modifier.padding(10.dp))
     }
 }
 

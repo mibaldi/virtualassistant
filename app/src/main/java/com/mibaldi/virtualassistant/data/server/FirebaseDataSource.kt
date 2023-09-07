@@ -20,13 +20,13 @@ class FirebaseDataSource @Inject constructor(): RemoteDataSource {
     override suspend fun getEvents(): Either<MyError, List<Event>> {
         val list = (0..9).map {
             when (it) {
-                0 -> {
+                /*0 -> {
                     Event(it,"Bookings", thumb = "https://firebasestorage.googleapis.com/v0/b/virtualassistant-b1514.appspot.com/o/cd-make-a-booking-300x300.png?alt=media&token=f445457e-0aba-499d-bc87-b76d02a8e496")
                 }
                 1 -> {
                     Event(it,"ChatGpt", thumb = "https://firebasestorage.googleapis.com/v0/b/virtualassistant-b1514.appspot.com/o/gpt.jpg?alt=media&token=8c242663-4152-4d3e-a7ce-2675b563477a")
-                }
-                2 -> {
+                }*/
+                0 -> {
                     Event(it,"Instagram Comidas", thumb = "https://firebasestorage.googleapis.com/v0/b/virtualassistant-b1514.appspot.com/o/instagramComidas.jpg?alt=media&token=78db553d-6760-4b6b-ac9e-2df676ff9d34")
                 }
                 else -> {

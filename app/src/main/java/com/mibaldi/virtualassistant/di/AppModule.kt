@@ -2,6 +2,7 @@ package com.mibaldi.virtualassistant.di
 
 import android.content.Context
 import com.mibaldi.virtualassistant.App
+import com.mibaldi.virtualassistant.BuildConfig
 import com.mibaldi.virtualassistant.data.datasource.ChatGptDataSource
 import com.mibaldi.virtualassistant.data.datasource.LocalDataSource
 import com.mibaldi.virtualassistant.data.datasource.RemoteDataSource
@@ -31,7 +32,7 @@ object AppModule {
     @ApiChatGptUrl
     fun provideApiUrl(): String = "https://api.openai.com/v1/"
 
-    val secret = "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"
+    val secret = BuildConfig.API_KEY
 
     @Provides
     @Singleton

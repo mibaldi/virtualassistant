@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException
 import com.google.api.services.calendar.Calendar
 import com.mibaldi.virtualassistant.data.managers.Constants
+import com.mibaldi.virtualassistant.data.managers.getEvents
 import com.mibaldi.virtualassistant.data.managers.setMibaldiEvents
 import com.mibaldi.virtualassistant.domain.Event
 import com.mibaldi.virtualassistant.domain.MyError
@@ -22,6 +23,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
+import com.google.api.services.calendar.model.Event as CalendarEvent
+
 
 @HiltViewModel
 class BookingViewModel @Inject constructor(
@@ -31,10 +34,13 @@ class BookingViewModel @Inject constructor(
     private val _state = MutableStateFlow(UiState())
     val state : StateFlow<UiState> = _state.asStateFlow()
 
-    private val _setBooking = MutableStateFlow(SetBooking("",""))
+    private val _setBooking = MutableStateFlow(SetBooking())
     val setBooking : StateFlow<SetBooking> = _setBooking.asStateFlow()
     private val _error = MutableStateFlow<AccountError?>(null)
     val error : StateFlow<AccountError?> = _error.asStateFlow()
+
+    private val _calendarState = MutableStateFlow(CalendarUiState())
+    val calendarState : StateFlow<CalendarUiState> = _calendarState.asStateFlow()
 
     fun getBookings() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -46,6 +52,11 @@ class BookingViewModel @Inject constructor(
             )
         }
     }
+    fun getMibaldiEvents(mService: Calendar,calendarId:String){
+        viewModelScope.launch(Dispatchers.IO) {
+            _calendarState.value = CalendarUiState(calendarEvents=getEvents(mService,calendarId))
+        }
+    }
     fun setToast(state:Boolean) {
         _state.update { it.copy(showToast = state) }
     }
@@ -53,6 +64,7 @@ class BookingViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 setMibaldiEvents(mService, setBooking.value.name, setBooking.value.dateString)
+                _setBooking.value = SetBooking()
                 setToast(true)
             } catch (e: IOException) {
                 Log.d("Google", e.message.toString())
@@ -67,12 +79,17 @@ class BookingViewModel @Inject constructor(
         _setBooking.value = SetBooking(name,dateString)
         Log.d("CREATEBOOKING","$name: $dateString")
     }
-    data class SetBooking(val name:String,val dateString:String)
+    data class SetBooking(val name:String ="",val dateString:String="")
     data class AccountError(val exception: UserRecoverableAuthIOException)
     data class UiState(
         val loading: Boolean = false,
         val showToast: Boolean = false,
         val events: List<Event>? = null,
+        val error: MyError? = null
+    )
+    data class CalendarUiState(
+        val loading: Boolean = false,
+        val calendarEvents: List<CalendarEvent>? = null,
         val error: MyError? = null
     )
 }

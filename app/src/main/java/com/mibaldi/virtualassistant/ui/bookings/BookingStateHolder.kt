@@ -4,6 +4,7 @@ import android.accounts.AccountManager
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
@@ -20,9 +21,14 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.common.GooglePlayServicesUtil
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
+import com.google.api.services.calendar.Calendar
 import com.mibaldi.virtualassistant.data.managers.Constants
+import com.mibaldi.virtualassistant.data.managers.acquireGooglePlayServices
 import com.mibaldi.virtualassistant.data.managers.initCalendarBuild
 import com.mibaldi.virtualassistant.data.managers.initCredentials
+import com.mibaldi.virtualassistant.data.managers.isDeviceOnline
 import com.mibaldi.virtualassistant.ui.common.UserViewModel
 import com.mibaldi.virtualassistant.ui.common.showAppSettingsDialog
 import com.mibaldi.virtualassistant.ui.common.showPermissionExplanationDialog
@@ -30,6 +36,7 @@ import com.mibaldi.virtualassistant.ui.navigation.Feature
 import com.mibaldi.virtualassistant.ui.navigation.NavCommand
 import com.mibaldi.virtualassistant.ui.navigation.NavItem
 import com.mibaldi.virtualassistant.ui.navigation.navigatePoppingUpToStartDestination
+import pub.devrel.easypermissions.EasyPermissions
 
 
 @Composable
@@ -75,7 +82,7 @@ class BookingState(
         }
 
     @Composable
-    fun generateAccountPickerLauncher(){
+    fun generateAccountPickerLauncher(task:()->Unit){
             val r = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK && result.data != null) {
                     if (result.data?.extras != null) {
@@ -86,7 +93,8 @@ class BookingState(
                             editor?.putString(Constants.PREF_ACCOUNT_NAME, accountName)
                             editor?.apply()
                             mCredential.selectedAccountName = accountName
-                            setEvents(context,mCredential,vm,mService,accountPickerLauncher,getAccountLauncher)
+                            workWithEvents(context,mCredential,vm,mService,accountPickerLauncher,getAccountLauncher,task)
+                            //{vm.setDataInCalendar(mService!!) }
                         }
                     }
                 }
@@ -100,10 +108,12 @@ class BookingState(
         }
 
     @Composable
-    fun generateGetAccountLauncher() {
+    fun generateGetAccountLauncher(task:()->Unit) {
         val r = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             with(context as Activity){
-                if (isGranted) setEvents(context,mCredential,vm,mService,accountPickerLauncher,getAccountLauncher) else {
+                if (isGranted) workWithEvents(context,mCredential,vm,mService,accountPickerLauncher,getAccountLauncher,task)
+                //{vm.setDataInCalendar(mService!!)}
+                else {
                     if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.GET_ACCOUNTS)) {
                         showPermissionExplanationDialog(getAccountLauncher)
                     } else {
@@ -113,5 +123,41 @@ class BookingState(
             }
         }
         getAccountLauncher = r
+    }
+}
+
+fun workWithEvents(
+    context: Context,
+    mCredential: GoogleAccountCredential,
+    viewModel: BookingViewModel,
+    mService: Calendar?,
+    accountPickerLauncher: ActivityResultLauncher<Intent>,
+    getAccountLauncher: ActivityResultLauncher<String>,
+    task: ()->Unit
+){
+    with (context as Activity){
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) != 0) {
+            (context as Activity).acquireGooglePlayServices()
+        } else if (mCredential.selectedAccountName == null) {
+            if (EasyPermissions.hasPermissions(this, android.Manifest.permission.GET_ACCOUNTS)
+            ) {
+                val accountName = this.getPreferences(Context.MODE_PRIVATE)
+                    ?.getString(Constants.PREF_ACCOUNT_NAME, null)
+                if (accountName != null) {
+                    mCredential.selectedAccountName = accountName
+                    workWithEvents(context,mCredential,viewModel,mService,accountPickerLauncher,getAccountLauncher,task)
+                } else {
+                    // Start a dialog from which the user can choose an account
+                    accountPickerLauncher.launch(mCredential.newChooseAccountIntent())
+                }
+            } else {
+                getAccountLauncher.launch(android.Manifest.permission.GET_ACCOUNTS)
+            }
+        } else if (!isDeviceOnline()) {
+            Log.d("SETEVENT","ERROR" )
+        } else {
+            task()
+            //viewModel.setDataInCalendar(mService!!)
+        }
     }
 }
