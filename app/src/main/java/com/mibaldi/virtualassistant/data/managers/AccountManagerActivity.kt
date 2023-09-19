@@ -68,34 +68,3 @@ private fun Activity.chooseAccount(mCredential: GoogleAccountCredential,networkE
     }
 }
 
-fun Activity.onActivityResult(mCredential: GoogleAccountCredential,requestCode: Int, resultCode: Int, data: Intent?,errorPlayServices:()->Unit,getResultsFromApiExtracted:()->Unit){
-
-    when (requestCode) {
-        /*Constants.REQUEST_GOOGLE_PLAY_SERVICES -> if (resultCode != Activity.RESULT_OK) {
-            errorPlayServices()
-        } else {
-            getResultsFromApiExtracted()
-
-        }
-
-        Constants.REQUEST_ACCOUNT_PICKER -> if (resultCode == Activity.RESULT_OK && data != null &&
-            data.extras != null
-        ) {
-            val accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
-            if (accountName != null) {
-                val settings = this.getPreferences(Context.MODE_PRIVATE)
-                val editor = settings?.edit()
-                editor?.putString(Constants.PREF_ACCOUNT_NAME, accountName)
-                editor?.apply()
-                mCredential.selectedAccountName = accountName
-                getResultsFromApiExtracted()
-
-            }
-        }
-
-        Constants.REQUEST_AUTHORIZATION -> if (resultCode == Activity.RESULT_OK) {
-            getResultsFromApiExtracted()
-        }*/
-    }
-}
-

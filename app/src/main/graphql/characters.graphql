@@ -1,0 +1,22 @@
+query GetCharactersByNameAndPage($page:Int!){
+    characters(page: $page) {
+        info {
+            count,
+            pages,
+            next
+        }
+        results {
+            id,
+            name,
+            image
+        }
+    }
+}
+query GetCharacterDetail($id: ID!){
+    character(id: $id) {
+        id,
+        name,
+        image,
+        status
+    }
+}

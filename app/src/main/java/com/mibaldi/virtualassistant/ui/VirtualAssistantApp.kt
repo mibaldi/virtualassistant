@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
@@ -14,6 +15,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -37,8 +39,10 @@ import com.mibaldi.virtualassistant.ui.navigation.VirtualAssistantTopAppBar
 fun VirtualAssistantApp(appState: VirtualAssistantState = rememberVirtualAssistantState()) {
     val logged = appState.isLoggedIn.isLogged
     val context = LocalContext.current
-    LaunchedEffect(logged){
-        if (!logged){
+    // Crea una instancia de ScaffoldState
+    val scaffoldState = rememberScaffoldState()
+    LaunchedEffect(logged) {
+        if (!logged) {
             context.goToHome()
             (context as Activity).finish()
         }

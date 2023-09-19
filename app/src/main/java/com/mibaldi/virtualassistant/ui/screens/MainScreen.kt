@@ -25,26 +25,22 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mibaldi.virtualassistant.R
 import com.mibaldi.virtualassistant.domain.Event
+import com.mibaldi.virtualassistant.ui.common.AdContent
 import com.mibaldi.virtualassistant.ui.common.GifImage
 import com.mibaldi.virtualassistant.ui.common.Thumb
 import com.mibaldi.virtualassistant.ui.common.Title
 import com.mibaldi.virtualassistant.ui.common.UserViewModel
 import com.mibaldi.virtualassistant.ui.common.errorToString
 import com.mibaldi.virtualassistant.ui.common.goToHome
-
 import com.mibaldi.virtualassistant.ui.main.MainViewModel
-
-
-
-
 
 
 @ExperimentalFoundationApi
 @Composable
-fun MainScreen(userViewModel: UserViewModel = hiltViewModel(),onNavigate: (Event) -> Unit) {
+fun MainScreen(userViewModel: UserViewModel = hiltViewModel(), onNavigate: (Event) -> Unit) {
     val context = LocalContext.current
 
-    userViewModel.isLoggedIn.observe(LocalLifecycleOwner.current){ isLoggedIn ->
+    userViewModel.isLoggedIn.observe(LocalLifecycleOwner.current) { isLoggedIn ->
         if (!isLoggedIn) {
             // User is logged out, perform necessary actions
             context.goToHome()
@@ -53,20 +49,27 @@ fun MainScreen(userViewModel: UserViewModel = hiltViewModel(),onNavigate: (Event
     }
 
     Column {
-        GifImage(url="https://firebasestorage.googleapis.com/v0/b/virtualassistant-b1514.appspot.com/o/Conoce_a_SAM_nuestra_asistente_virtual.gif?alt=media&token=4135a9f3-a26f-42c1-8722-febb65249942")
+        GifImage(url = "https://firebasestorage.googleapis.com/v0/b/virtualassistant-b1514.appspot.com/o/Conoce_a_SAM_nuestra_asistente_virtual.gif?alt=media&token=4135a9f3-a26f-42c1-8722-febb65249942")
         MainContent(onNavigate = onNavigate)
+        // on below line adding admob banner ads.
+        AdContent()
     }
 }
 
+
 @ExperimentalFoundationApi
 @Composable
-fun MainContent(modifier: Modifier = Modifier,vm: MainViewModel = hiltViewModel(),onNavigate: (Event) -> Unit ) {
+fun MainContent(
+    modifier: Modifier = Modifier,
+    vm: MainViewModel = hiltViewModel(),
+    onNavigate: (Event) -> Unit
+) {
     val context = LocalContext.current as Activity
-    LaunchedEffect(Unit){
+    LaunchedEffect(Unit) {
         vm.getEvents()
     }
     EventList(
-        onClick = { onNavigate(it)},
+        onClick = { onNavigate(it) },
         modifier = modifier
     )
     val state by vm.state.collectAsState()
@@ -74,6 +77,7 @@ fun MainContent(modifier: Modifier = Modifier,vm: MainViewModel = hiltViewModel(
         Text(text = LocalContext.current.errorToString(it))
     }
 }
+
 @ExperimentalFoundationApi
 @Composable
 fun EventList(
@@ -84,8 +88,10 @@ fun EventList(
 
     val state by vm.state.collectAsState()
     val list = state.events ?: emptyList()
-    LazyRow(contentPadding = PaddingValues(dimensionResource(R.dimen.padding_xsmall)),
-        modifier = modifier) {
+    LazyRow(
+        contentPadding = PaddingValues(dimensionResource(R.dimen.padding_xsmall)),
+        modifier = modifier
+    ) {
         items(list) {
             EventListItem(
                 eventItem = it,
@@ -110,7 +116,10 @@ fun EventListItem(
                 itemThumb = eventItem.thumb,
                 modifier = modifier.height(dimensionResource(R.dimen.cell_thumb_height))
             )
-            Title(eventItem.name,modifier = modifier.width(dimensionResource(R.dimen.cell_thumb_height)))
+            Title(
+                eventItem.name,
+                modifier = modifier.width(dimensionResource(R.dimen.cell_thumb_height))
+            )
         }
     }
 }
@@ -118,7 +127,7 @@ fun EventListItem(
 
 @Preview(showSystemUi = true)
 @Composable
-fun MainPreview(){
+fun MainPreview() {
     Card(
         modifier = Modifier
             .clickable { }
@@ -127,10 +136,12 @@ fun MainPreview(){
         Column {
             Thumb(
                 itemThumb = "eventItem.thumb",
-                modifier = Modifier.height(dimensionResource(R.dimen.cell_thumb_height)
+                modifier = Modifier.height(
+                    dimensionResource(R.dimen.cell_thumb_height)
                 )
             )
             Title("eventItem.name")
         }
     }
 }
+

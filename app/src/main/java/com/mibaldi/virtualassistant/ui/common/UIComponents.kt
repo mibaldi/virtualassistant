@@ -29,6 +29,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.ImageLoader
 import coil.compose.AsyncImage
@@ -36,6 +37,9 @@ import coil.compose.rememberAsyncImagePainter
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
 import coil.size.Size
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import com.mibaldi.virtualassistant.R
 import com.mibaldi.virtualassistant.ui.main.MainViewModel
 
@@ -102,6 +106,25 @@ private fun AppBarAction(
             contentDescription = null
         )
     }
+}
+@Composable
+fun AdContent(size: AdSize = AdSize.BANNER, id: String = "ca-app-pub-3940256099942544/6300978111"){
+    AndroidView(
+        // on below line specifying width for ads.
+        modifier = Modifier.fillMaxWidth(),
+        factory = { context ->
+            // on below line specifying ad view.
+            AdView(context).apply {
+                // on below line specifying ad size
+                setAdSize(size)
+                // on below line specifying ad unit id
+                // currently added a test ad unit id.
+                adUnitId = id
+                // calling load ad to load our ad.
+                loadAd(AdRequest.Builder().build())
+            }
+        }
+    )
 }
 @Composable
 fun Title(itemName: String,modifier :Modifier = Modifier) {

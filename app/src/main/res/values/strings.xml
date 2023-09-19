@@ -52,4 +52,5 @@
     <string name="settings">Configuración</string>
     <string name="home">Home</string>
     <string name="chat">Chat GPT</string>
+    <string name="default_notification_channel_id">virtualAssistant</string>
 </resources>

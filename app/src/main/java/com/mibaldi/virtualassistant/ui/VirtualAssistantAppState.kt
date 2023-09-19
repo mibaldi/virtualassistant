@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun rememberVirtualAssistantState(
+
     scaffoldState: DrawerState = rememberDrawerState(DrawerValue.Closed),
     navController: NavHostController = rememberNavController(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),

@@ -1,13 +1,13 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.mibaldi.virtualassistant.buildsrc.Libs
-import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
 
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id ("org.jetbrains.kotlin.kapt")
-    id ("dagger.hilt.android.plugin")
+    id("org.jetbrains.kotlin.kapt")
+    id("dagger.hilt.android.plugin")
     id("com.google.gms.google-services")
+    id("io.gitlab.arturbosch.detekt")
+    id("com.apollographql.apollo3").version("3.8.2")
 }
 
 android {
@@ -37,15 +37,18 @@ android {
 
     buildTypes {
         debug {
-            signingConfig =  signingConfigs.getByName("api")
+            signingConfig = signingConfigs.getByName("api")
             buildConfigField("API_KEY", openai_api_key)
 
         }
         release {
-            signingConfig =  signingConfigs.getByName("api")
+            signingConfig = signingConfigs.getByName("api")
             isMinifyEnabled = false
             buildConfigField("API_KEY", openai_api_key)
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
 
     }
@@ -117,6 +120,7 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))
     implementation("com.google.firebase:firebase-database-ktx:20.2.2")
+    implementation("com.google.firebase:firebase-messaging-ktx:23.2.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
@@ -134,39 +138,41 @@ dependencies {
     implementation(Libs.Hilt.android)
     kapt(Libs.Hilt.compiler)
 
-    implementation (Libs.AndroidX.Compose.UI.ui)
-    implementation (Libs.AndroidX.Compose.UI.toolingPreview)
-    implementation (Libs.AndroidX.Compose.Material3.material3)
-    implementation (Libs.AndroidX.Compose.Material3.materialIconsExtended)
-    implementation (Libs.AndroidX.Activity.compose)
-    implementation (Libs.AndroidX.Lifecycle.viewmodelCompose)
-    implementation (Libs.AndroidX.Navigation.compose)
-    implementation (Libs.Coil.compose)
-    implementation (Libs.Coil.gif)
-    implementation (Libs.Hilt.navigationCompose)
-    debugImplementation (Libs.AndroidX.Compose.UI.tooling)
+    implementation(Libs.AndroidX.Compose.UI.ui)
+    implementation(Libs.AndroidX.Compose.UI.toolingPreview)
+    implementation(Libs.AndroidX.Compose.Material3.material3)
+    implementation(Libs.AndroidX.Compose.Material3.materialIconsExtended)
+    implementation(Libs.AndroidX.Activity.compose)
+    implementation(Libs.AndroidX.Lifecycle.viewmodelCompose)
+    implementation(Libs.AndroidX.Navigation.compose)
+    implementation(Libs.Coil.compose)
+    implementation(Libs.Coil.gif)
+    implementation(Libs.Hilt.navigationCompose)
+    debugImplementation(Libs.AndroidX.Compose.UI.tooling)
     implementation("androidx.credentials:credentials:1.2.0-beta01")
     implementation("androidx.credentials:credentials-play-services-auth:1.2.0-beta01")
-    implementation ("com.google.android.libraries.identity.googleid:googleid:1.0.1")
-    implementation ("com.google.android.gms:play-services-auth:20.6.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.0.1")
+    implementation("com.google.android.gms:play-services-auth:20.6.0")
     //for google auth and calendar integrations
-    implementation ("com.google.oauth-client:google-oauth-client-jetty:1.23.0")
-    implementation ("com.google.apis:google-api-services-calendar:v3-rev305-1.23.0")
+    implementation("com.google.oauth-client:google-oauth-client-jetty:1.23.0")
+    implementation("com.google.apis:google-api-services-calendar:v3-rev305-1.23.0")
 
     //to avoid conflicts in libraries
-    implementation ("com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava")
+    implementation("com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava")
 
     implementation("com.google.api-client:google-api-client-android:1.23.0") {
-        exclude ("org.apache.httpcomponents")
+        exclude("org.apache.httpcomponents")
     }
 
     //so that we can easily control permissions
-    implementation ("pub.devrel:easypermissions:3.0.0")
-    implementation ("com.savvi.datepicker:rangepicker:1.3.0")
+    implementation("pub.devrel:easypermissions:3.0.0")
+    implementation("com.savvi.datepicker:rangepicker:1.3.0")
 
-    implementation ("com.google.accompanist:accompanist-pager:0.28.0")
-    implementation ("com.google.accompanist:accompanist-pager-indicators:0.28.0")
-    implementation ("com.google.accompanist:accompanist-systemuicontroller:0.28.0")
+    implementation("com.google.accompanist:accompanist-pager:0.28.0")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.28.0")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.28.0")
+
+    implementation("com.google.android.gms:play-services-ads:22.3.0")
 
     /*testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -175,4 +181,13 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")*/
+
+    implementation("com.apollographql.apollo3:apollo-runtime")
+    implementation("com.google.accompanist:accompanist-permissions:0.28.0")
+
+}
+apollo {
+    service("service") {
+        packageName.set("com.mibaldi.virtualassistant")
+    }
 }

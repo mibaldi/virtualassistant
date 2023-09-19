@@ -1,6 +1,8 @@
 import com.mibaldi.virtualassistant.buildsrc.Libs
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-apply plugin: "com.github.ben-manes.versions"
+//apply plugin:
+
 
 buildscript {
     repositories {
@@ -17,9 +19,13 @@ buildscript {
         classpath Libs.gradleVersionsPlugin
         classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10'
         classpath 'com.google.gms:google-services:4.3.15'
+        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.23.0"
     }
 }
-
+plugins {
+    id "io.gitlab.arturbosch.detekt" version("1.23.0")
+    // id "com.github.ben-manes.versions" apply true
+}
 
 // Taken from https://github.com/ben-manes/gradle-versions-plugin
 def isNonStable = { String version ->
@@ -28,11 +34,11 @@ def isNonStable = { String version ->
     return !stableKeyword && !(version ==~ regex)
 }
 
-tasks.named("dependencyUpdates").configure {
+/*tasks.named("dependencyUpdates").configure {
     rejectVersionIf {
         isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
     }
-}
+}*/
 
 task clean(type: Delete) {
     delete rootProject.buildDir

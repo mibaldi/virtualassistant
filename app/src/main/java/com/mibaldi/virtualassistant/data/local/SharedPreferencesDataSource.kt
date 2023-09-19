@@ -3,20 +3,21 @@ package com.mibaldi.virtualassistant.data.local
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import com.mibaldi.virtualassistant.data.datasource.LocalDataSource
+import com.mibaldi.virtualassistant.data.datasource.UserLocalDataSource
 import javax.inject.Inject
 
-class SharedPreferencesDataSource @Inject constructor(context:Application):LocalDataSource {
+class SharedPreferencesDataSource @Inject constructor(context: Application) : UserLocalDataSource {
 
-    private val sharedPreferences: SharedPreferences = context.getSharedPreferences("VirtualAssistant", Context.MODE_PRIVATE)
+    private val sharedPreferences: SharedPreferences =
+        context.getSharedPreferences("VirtualAssistant", Context.MODE_PRIVATE)
 
 
     override fun isLogged(): Boolean {
-        return getSharedPreferenceBoolean("logged",false)
+        return getSharedPreferenceBoolean("logged", false)
     }
 
     override fun setLogged(logged: Boolean) {
-        setSharedPreferenceBoolean("logged",logged)
+        setSharedPreferenceBoolean("logged", logged)
     }
 
     private fun setSharedPreferenceString(key: String, value: String?) {

@@ -45,24 +45,32 @@ import com.mibaldi.virtualassistant.ui.chat.rememberChatState
 
 @ExperimentalFoundationApi
 @Composable
-fun ChatScreenActivity(vm: ChatViewModel = hiltViewModel(), chatState: ChatState = rememberChatState()) {
+fun ChatScreenActivity(
+    vm: ChatViewModel = hiltViewModel(),
+    chatState: ChatState = rememberChatState()
+) {
 
-    LaunchedEffect(Unit){
+    LaunchedEffect(Unit) {
         chatState.generateTextToSpeech()
     }
 
     val speaking by vm.speaking.collectAsState()
-    LaunchedEffect(speaking){
-        if (!speaking){
+    LaunchedEffect(speaking) {
+        if (!speaking) {
             chatState.textToSpeech?.stop()
         }
     }
 
     val speech by vm.speech.collectAsState()
-    LaunchedEffect(speech){
-        if (speech.isNotEmpty()){
+    LaunchedEffect(speech) {
+        if (speech.isNotEmpty()) {
             vm.setSpeaking(true)
-            chatState.textToSpeech?.speak(speech, TextToSpeech.QUEUE_FLUSH,null, TextToSpeech.ACTION_TTS_QUEUE_PROCESSING_COMPLETED)
+            chatState.textToSpeech?.speak(
+                speech,
+                TextToSpeech.QUEUE_FLUSH,
+                null,
+                TextToSpeech.ACTION_TTS_QUEUE_PROCESSING_COMPLETED
+            )
         }
     }
 
@@ -71,7 +79,7 @@ fun ChatScreenActivity(vm: ChatViewModel = hiltViewModel(), chatState: ChatState
         val chatMessages by vm.messages.collectAsState()
 
         LazyColumn(
-            modifier= Modifier
+            modifier = Modifier
                 .weight(1f)
                 .padding(16.dp),
             reverseLayout = true
@@ -81,10 +89,11 @@ fun ChatScreenActivity(vm: ChatViewModel = hiltViewModel(), chatState: ChatState
             }
         }
         val isSpeaking by vm.speaking.collectAsState()
-        Row (modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-        ){
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
             UserInput { messageText ->
                 val newMessage = Message("user", messageText)
                 vm.sendMessageChatGpt(newMessage)
@@ -100,75 +109,8 @@ fun ChatScreenActivity(vm: ChatViewModel = hiltViewModel(), chatState: ChatState
             }
         }
     }
-    /*MyAppComposable {
-        Scaffold(
-            bottomBar = {
-                val isSpeaking by vm.speaking.collectAsState()
-                Row (modifier = Modifier
-                    .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-
-                    UserInput { messageText ->
-                        val newMessage = Message("user", messageText)
-                        vm.sendMessageChatGpt(newMessage)
-                    }
-                    AnimatedVisibility(
-                        visible = isSpeaking,
-                        enter = fadeIn(),
-                        exit = fadeOut()
-                    ) {
-                        Button(onClick = { vm.setSpeaking(false) }) {
-                            Text(text = "Stop")
-                        }
-                    }
-                }
-
-            },
-            topBar = { MainAppBar(stringResource(id = R.string.app_name), logout = { logout() })
-            }
-        ) { padding ->
-            Column {
-                GifImage(url="https://firebasestorage.googleapis.com/v0/b/virtualassistant-b1514.appspot.com/o/Conoce_a_SAM_nuestra_asistente_virtual.gif?alt=media&token=4135a9f3-a26f-42c1-8722-febb65249942")
-                ChatContent(onNavigate = onNavigate, modifier = Modifier.padding(padding))
-                val isSpeaking by vm.speaking.collectAsState()
-                Row (modifier = Modifier
-                    .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-
-                    UserInput { messageText ->
-                        val newMessage = Message("user", messageText)
-                        vm.sendMessageChatGpt(newMessage)
-                    }
-                    AnimatedVisibility(
-                        visible = isSpeaking,
-                        enter = fadeIn(),
-                        exit = fadeOut()
-                    ) {
-                        Button(onClick = { vm.setSpeaking(false) }) {
-                            Text(text = "Stop")
-                        }
-                    }
-                }
-            }
-        }
-    }*/
 }
 
-
-
-@ExperimentalFoundationApi
-@Composable
-fun ChatContent(modifier: Modifier = Modifier) {
-    Column (modifier = modifier) {
-        ChatScreen()
-    }
-}
-@Composable
-fun ChatScreen(vm: ChatViewModel = hiltViewModel()) {
-
-}
 @Composable
 fun UserInput(onMessageSent: (String) -> Unit) {
     var text by remember { mutableStateOf("") }
@@ -233,10 +175,21 @@ fun ChatBubble(
 private fun BubbleShape(isUserMessage: Boolean): Shape {
     return when {
         isUserMessage -> {
-            CircleShape.copy(topStart = ZeroCornerSize,topEnd= ZeroCornerSize, bottomEnd = ZeroCornerSize, bottomStart = ZeroCornerSize)
+            CircleShape.copy(
+                topStart = ZeroCornerSize,
+                topEnd = ZeroCornerSize,
+                bottomEnd = ZeroCornerSize,
+                bottomStart = ZeroCornerSize
+            )
         }
+
         else -> {
-            CircleShape.copy(topStart = ZeroCornerSize,topEnd= ZeroCornerSize, bottomEnd = ZeroCornerSize, bottomStart = ZeroCornerSize)
+            CircleShape.copy(
+                topStart = ZeroCornerSize,
+                topEnd = ZeroCornerSize,
+                bottomEnd = ZeroCornerSize,
+                bottomStart = ZeroCornerSize
+            )
         }
     }
 }
